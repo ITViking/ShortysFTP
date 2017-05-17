@@ -45,6 +45,7 @@ namespace ShortysFTP
 
         }
 
+        //Taken from: https://docs.microsoft.com/en-us/dotnet/articles/csharp/programming-guide/file-system/how-to-iterate-through-a-directory-tree
         public static void List(System.IO.DirectoryInfo root)
         {
             System.IO.FileInfo[] files = null;

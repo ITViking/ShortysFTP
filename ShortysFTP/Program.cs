@@ -17,7 +17,7 @@ namespace ShortysFTP
             int port = 22;
             var user = "phil"; //USername on host
             var pass = "Scout4Life!"; //Password for User
-            string localDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string localDirectory = @"C:\DEV"; //path to a local folder 
             string fileName = "";
 
             using (SftpClient sftp = new SftpClient(host, port, user, pass))
@@ -31,9 +31,9 @@ namespace ShortysFTP
                         //Remote location
                         Console.WriteLine("== Remote ==");
 
-                        string path = sftp.WorkingDirectory;
+                        string remotePath = sftp.WorkingDirectory;
 
-                        GetDirectoryTree(sftp, path);
+                        DirectoryTree.List(sftp, remotePath);
 
                         Console.WriteLine("");
                         Console.WriteLine("what file do you want to download?");
@@ -62,14 +62,10 @@ namespace ShortysFTP
 
                         //TO DO: get Local directory tree
 
-                        var localFiles = Directory.GetFiles(localDirectory);
-                        var localDirs = Directory.GetDirectories(localDirectory);
+                        DirectoryInfo localPath = new DirectoryInfo(localDirectory);
 
-                        foreach (var dir in localFiles)
-                        {
-                            Console.WriteLine(dir.Replace(localDirectory, ""));
-                        }
-
+                        DirectoryTree.List(localPath);
+                                                                                              
                         Console.WriteLine("");
                         Console.WriteLine("what file do you want to upload?");
                         Console.WriteLine(fileName);
@@ -86,49 +82,8 @@ namespace ShortysFTP
                     } //Keep alive for testing
 
                 } while (Console.ReadKey(true).Key == ConsoleKey.Escape); //Keep alive for testing
-
-
-
             }
-            
-
             Console.ReadKey();
-
-        }
-
-        private static void GetDirectoryTree(SftpClient sftp, string path)
-        {
-            string hiddenFiles = "."; //Dont list system files and etc            
-
-            List<SftpFile> directories = sftp.ListDirectory(path).ToList();
-            
-            foreach (var dir in directories)
-            {
-                if (!dir.Name.StartsWith(hiddenFiles))
-                {
-                    Console.WriteLine(dir.Name);
-
-                    if (dir.IsDirectory)
-                    {
-                        List<SftpFile> subDirectories = sftp.ListDirectory(dir.FullName.TrimEnd()).ToList();
-                        foreach (var sDir in subDirectories)
-                        {
-                            if (!sDir.Name.StartsWith(hiddenFiles))
-                            {
-                                Console.WriteLine(sDir.Name);
-
-                                if (sDir.IsDirectory)
-                                {
-                                    GetDirectoryTree(sftp, sDir.FullName);
-                                }
-                            }
-                        }
-
-                    }
-                }                    
-            }
-            
-
         }
     }
 }

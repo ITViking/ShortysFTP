@@ -17,8 +17,8 @@ namespace ShortysFTP
             int port = 22;
             var user = "phil"; //USername on host
             var pass = "Scout4Life!"; //Password for User
-            string localDirectory = @"C:\DEV"; //path to a local folder 
-            string fileName = "";
+            string localDirectory = @"C:\Users\philip.dein\Desktop\"; //path to a local folder 
+            //string fileName = "";
 
             using (SftpClient sftp = new SftpClient(host, port, user, pass))
             {
@@ -31,31 +31,17 @@ namespace ShortysFTP
                         //Remote location
                         Console.WriteLine("== Remote ==");
 
-                        string remotePath = sftp.WorkingDirectory;
+                        string remotePath = "/home/phil/Development";
+                        
 
                         DirectoryTree.List(sftp, remotePath);
 
                         Console.WriteLine("");
-                        Console.WriteLine("what file do you want to download?");
-                        Console.WriteLine(fileName);
+                        Console.WriteLine("what file do you want to download?" + " " + sftp.WorkingDirectory.ToString());
                         string fileToDownload = Console.ReadLine();
                         Console.Clear();
 
-                        fileName = fileToDownload;
-
-                        string localFileName = fileName;
-
-                        try
-                        {
-                            using (Stream file = File.OpenWrite(localDirectory + localFileName))
-                            {
-                                sftp.DownloadFile(sftp.WorkingDirectory + "/" + fileName, file);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
+                        FileType.Download(sftp, localDirectory, fileToDownload);                        
 
                         //Local users directory
                         Console.WriteLine("== Local ==");
@@ -68,7 +54,7 @@ namespace ShortysFTP
                                                                                               
                         Console.WriteLine("");
                         Console.WriteLine("what file do you want to upload?");
-                        Console.WriteLine(fileName);
+                        
                         string fileToUpload = Console.ReadLine();
                         Console.Clear();
 

@@ -104,60 +104,59 @@ namespace ShortysFTP
 
             List<SftpFile> directories = sftp.ListDirectory(file).ToList();
 
-            if (directories != null)
+            
+            foreach (var dir in directories)
             {
-                foreach (var dir in directories)
+                if (!dir.Name.StartsWith(hiddenFiles))
                 {
-                    if (!dir.Name.StartsWith(hiddenFiles))
+                    Console.WriteLine(dir.Name);
+
+                    if (dir.IsDirectory)
                     {
-                        Console.WriteLine(dir.Name);
+                        //Console.WriteLine("-" + dir.Name);
 
-                        if (dir.IsDirectory)
+                        //string workDir = dev;
+
+                        //sftp.ChangeDirectory(dir.FullName.TrimEnd()); //Change folder
+
+                        //Continue down through the folders 
+
+                        List<SftpFile> subDirectories = sftp.ListDirectory(dir.FullName.TrimEnd()).ToList();
+                        foreach (var sDir in subDirectories)
                         {
-                            Console.WriteLine("-" + dir.Name);
-
-                            //string workDir = dev;
-
-                            sftp.ChangeDirectory(dir.FullName.TrimEnd()); //Change folder
-
-                            //Continue down through the folders 
-
-                            List<SftpFile> subDirectories = sftp.ListDirectory(sftp.WorkingDirectory).ToList();
-                            foreach (var sDir in subDirectories)
+                            if (!sDir.Name.StartsWith(hiddenFiles))
                             {
-                                if (!sDir.Name.StartsWith(hiddenFiles))
+                                Console.WriteLine(sDir.Name);
+
+                                if (sDir.IsDirectory)
                                 {
-                                    Console.WriteLine(sDir.Name);
-
-                                    if (sDir.IsDirectory)
-                                    {
-                                        GetDirectoryTree(sftp, dir.FullName);
-                                    }
+                                    GetDirectoryTree(sftp, sDir.FullName);
                                 }
-
-
-
-                                //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsRegularFile)
-                                //{
-                                //    Console.WriteLine(sDir.Name);
-
-                                //}
-                                //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsDirectory)
-                                //{
-                                //    Console.WriteLine(sDir.Name);
-
-                                //}
-                                //if (!subDirectories.Contains(sDir))
-                                //{
-                                //    GetDirectoryTree(sftp, sDir);
-                                //}
-
                             }
 
+
+
+                            //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsRegularFile)
+                            //{
+                            //    Console.WriteLine(sDir.Name);
+
+                            //}
+                            //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsDirectory)
+                            //{
+                            //    Console.WriteLine(sDir.Name);
+
+                            //}
+                            //if (!subDirectories.Contains(sDir))
+                            //{
+                            //    GetDirectoryTree(sftp, sDir);
+                            //}
+
                         }
-                    }                    
-                }
+
+                    }
+                }                    
             }
+            
 
         }
     }

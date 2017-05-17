@@ -98,12 +98,9 @@ namespace ShortysFTP
 
         private static void GetDirectoryTree(SftpClient sftp, string file)
         {
-            string hiddenFiles = "."; //Dont list system files and etc
-
-            //string dev = "/home/phil/Development";
+            string hiddenFiles = "."; //Dont list system files and etc            
 
             List<SftpFile> directories = sftp.ListDirectory(file).ToList();
-
             
             foreach (var dir in directories)
             {
@@ -113,14 +110,6 @@ namespace ShortysFTP
 
                     if (dir.IsDirectory)
                     {
-                        //Console.WriteLine("-" + dir.Name);
-
-                        //string workDir = dev;
-
-                        //sftp.ChangeDirectory(dir.FullName.TrimEnd()); //Change folder
-
-                        //Continue down through the folders 
-
                         List<SftpFile> subDirectories = sftp.ListDirectory(dir.FullName.TrimEnd()).ToList();
                         foreach (var sDir in subDirectories)
                         {
@@ -133,24 +122,6 @@ namespace ShortysFTP
                                     GetDirectoryTree(sftp, sDir.FullName);
                                 }
                             }
-
-
-
-                            //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsRegularFile)
-                            //{
-                            //    Console.WriteLine(sDir.Name);
-
-                            //}
-                            //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsDirectory)
-                            //{
-                            //    Console.WriteLine(sDir.Name);
-
-                            //}
-                            //if (!subDirectories.Contains(sDir))
-                            //{
-                            //    GetDirectoryTree(sftp, sDir);
-                            //}
-
                         }
 
                     }

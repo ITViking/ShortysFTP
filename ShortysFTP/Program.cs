@@ -13,12 +13,12 @@ namespace ShortysFTP
     {
         static void Main(string[] args)
         {            
-            var host = "192.168.43.246"; //IP adress
+            var host = "10.192.138.169"; //IP adress
             int port = 22;
             var user = "phil"; //USername on host
             var pass = "Scout4Life!"; //Password for User
-            string localDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string fileName = "";
+            string localDirectory = @"C:\Users\philip.dein\Desktop\"; //path to a local folder 
+            //string fileName = "";
 
             using (SftpClient sftp = new SftpClient(host, port, user, pass))
             {
@@ -31,107 +31,42 @@ namespace ShortysFTP
                         //Remote location
                         Console.WriteLine("== Remote ==");
 
-                        GetDirectoryTree(sftp);
+                        string remotePath = "/home/phil/Development";
 
+                        //get remote directory tree
+                        DirectoryTree.List(sftp, remotePath);
+
+                        //Interact with user
                         Console.WriteLine("");
-                        Console.WriteLine("what file do you want to download?");
-                        Console.WriteLine(fileName);
+                        Console.WriteLine("what file do you want to download?" + " " + sftp.WorkingDirectory.ToString());
                         string fileToDownload = Console.ReadLine();
                         Console.Clear();
 
-                        fileName = fileToDownload;
-
-                        string localFileName = fileName;
-
-                        try
-                        {
-                            using (Stream file = File.OpenWrite(localDirectory + localFileName))
-                            {
-                                sftp.DownloadFile(sftp.WorkingDirectory + "/" + fileName, file);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
+                        FileType.Download(sftp, localDirectory, fileToDownload);
 
                         //Local users directory
                         Console.WriteLine("== Local ==");
 
-                        //TO DO: get Local directory tree
+                        //get Local directory tree
 
-                        var localFiles = Directory.GetFiles(localDirectory);
-                        var localDirs = Directory.GetDirectories(localDirectory);
+                        DirectoryInfo localPath = new DirectoryInfo(localDirectory);
 
-                        foreach (var dir in localFiles)
-                        {
-                            Console.WriteLine(dir.Replace(localDirectory, ""));
-                        }
+                        DirectoryTree.List(localPath);
 
+                        //Interact with user
+                                                                                              
                         Console.WriteLine("");
-                        Console.WriteLine("what file do you want to upload?");
-                        Console.WriteLine(fileName);
+                        Console.WriteLine("what file do you want to upload?");                        
                         string fileToUpload = Console.ReadLine();
                         Console.Clear();
 
-                        string remoteFileName = fileToUpload;
-
-                        using (Stream file = File.OpenRead(localDirectory + remoteFileName))
-                        {
-                            sftp.UploadFile(file, localDirectory + fileToUpload);
-                        }
+                        FileType.Upload(sftp, localDirectory, fileToUpload);
 
                     } //Keep alive for testing
 
                 } while (Console.ReadKey(true).Key == ConsoleKey.Escape); //Keep alive for testing
-
-
-
             }
-            
-
             Console.ReadKey();
-
-        }
-
-        private static void GetDirectoryTree(SftpClient sftp)
-        {
-            string hiddenFiles = "."; //Dont list system files and etc
-
-            List<SftpFile> directories = sftp.ListDirectory(sftp.WorkingDirectory).ToList();
-
-            foreach (var dir in directories)
-            {
-                if (!dir.Name.StartsWith(hiddenFiles) && dir.IsRegularFile)
-                {
-                    Console.WriteLine("-" + dir.Name);
-                }
-                if (!dir.Name.StartsWith(hiddenFiles) && dir.IsDirectory)
-                {
-                    Console.WriteLine("*" + dir.Name);
-
-                    string workDir = sftp.WorkingDirectory;
-
-                    sftp.ChangeDirectory(dir.FullName.TrimEnd()); //Change folder
-
-                    //Continue down through the folders 
-
-                    List<SftpFile> subDirectories = sftp.ListDirectory(sftp.WorkingDirectory).ToList(); 
-                    foreach (var sDir in subDirectories)
-                    {
-                        if (!sDir.Name.StartsWith(hiddenFiles) && sDir.IsRegularFile)
-                        {
-                            Console.WriteLine("-" + sDir.Name);
-                        }
-                        if (!sDir.Name.StartsWith(hiddenFiles) && sDir.IsDirectory)
-                        {
-                            Console.WriteLine("*" + sDir.Name);
-                        }
-                    }
-                }
-
-
-            }
         }
     }
 }

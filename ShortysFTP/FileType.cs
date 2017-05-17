@@ -29,6 +29,14 @@ namespace ShortysFTP
             }
         }
 
-        public static void Upload()
+        public static void Upload(SftpClient sftp, string localDirectory, string fileToUpload)
+        {
+            string remoteFileName = fileToUpload;
+
+            using (Stream file = File.OpenRead(localDirectory + remoteFileName))
+            {
+                sftp.UploadFile(file, localDirectory + fileToUpload);
+            }
+        }
     }
 }

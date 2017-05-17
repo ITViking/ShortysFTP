@@ -32,38 +32,35 @@ namespace ShortysFTP
                         Console.WriteLine("== Remote ==");
 
                         string remotePath = "/home/phil/Development";
-                        
 
+                        //get remote directory tree
                         DirectoryTree.List(sftp, remotePath);
 
+                        //Interact with user
                         Console.WriteLine("");
                         Console.WriteLine("what file do you want to download?" + " " + sftp.WorkingDirectory.ToString());
                         string fileToDownload = Console.ReadLine();
                         Console.Clear();
 
-                        FileType.Download(sftp, localDirectory, fileToDownload);                        
+                        FileType.Download(sftp, localDirectory, fileToDownload);
 
                         //Local users directory
                         Console.WriteLine("== Local ==");
 
-                        //TO DO: get Local directory tree
+                        //get Local directory tree
 
                         DirectoryInfo localPath = new DirectoryInfo(localDirectory);
 
                         DirectoryTree.List(localPath);
+
+                        //Interact with user
                                                                                               
                         Console.WriteLine("");
-                        Console.WriteLine("what file do you want to upload?");
-                        
+                        Console.WriteLine("what file do you want to upload?");                        
                         string fileToUpload = Console.ReadLine();
                         Console.Clear();
 
-                        string remoteFileName = fileToUpload;
-
-                        using (Stream file = File.OpenRead(localDirectory + remoteFileName))
-                        {
-                            sftp.UploadFile(file, localDirectory + fileToUpload);
-                        }
+                        FileType.Upload(sftp, localDirectory, fileToUpload);
 
                     } //Keep alive for testing
 

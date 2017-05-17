@@ -13,7 +13,7 @@ namespace ShortysFTP
     {
         static void Main(string[] args)
         {            
-            var host = "192.168.43.246"; //IP adress
+            var host = "10.192.138.169"; //IP adress
             int port = 22;
             var user = "phil"; //USername on host
             var pass = "Scout4Life!"; //Password for User
@@ -31,7 +31,9 @@ namespace ShortysFTP
                         //Remote location
                         Console.WriteLine("== Remote ==");
 
-                        GetDirectoryTree(sftp);
+                        string tf = "/home/phil/Development";
+
+                        GetDirectoryTree(sftp, tf);
 
                         Console.WriteLine("");
                         Console.WriteLine("what file do you want to download?");
@@ -94,44 +96,69 @@ namespace ShortysFTP
 
         }
 
-        private static void GetDirectoryTree(SftpClient sftp)
+        private static void GetDirectoryTree(SftpClient sftp, string file)
         {
             string hiddenFiles = "."; //Dont list system files and etc
 
-            List<SftpFile> directories = sftp.ListDirectory(sftp.WorkingDirectory).ToList();
+            //string dev = "/home/phil/Development";
 
-            foreach (var dir in directories)
+            List<SftpFile> directories = sftp.ListDirectory(file).ToList();
+
+            if (directories != null)
             {
-                if (!dir.Name.StartsWith(hiddenFiles) && dir.IsRegularFile)
+                foreach (var dir in directories)
                 {
-                    Console.WriteLine("-" + dir.Name);
-                }
-                if (!dir.Name.StartsWith(hiddenFiles) && dir.IsDirectory)
-                {
-                    Console.WriteLine("*" + dir.Name);
-
-                    string workDir = sftp.WorkingDirectory;
-
-                    sftp.ChangeDirectory(dir.FullName.TrimEnd()); //Change folder
-
-                    //Continue down through the folders 
-
-                    List<SftpFile> subDirectories = sftp.ListDirectory(sftp.WorkingDirectory).ToList(); 
-                    foreach (var sDir in subDirectories)
+                    if (!dir.Name.StartsWith(hiddenFiles))
                     {
-                        if (!sDir.Name.StartsWith(hiddenFiles) && sDir.IsRegularFile)
+                        Console.WriteLine(dir.Name);
+
+                        if (dir.IsDirectory)
                         {
-                            Console.WriteLine("-" + sDir.Name);
+                            Console.WriteLine("-" + dir.Name);
+
+                            //string workDir = dev;
+
+                            sftp.ChangeDirectory(dir.FullName.TrimEnd()); //Change folder
+
+                            //Continue down through the folders 
+
+                            List<SftpFile> subDirectories = sftp.ListDirectory(sftp.WorkingDirectory).ToList();
+                            foreach (var sDir in subDirectories)
+                            {
+                                if (!sDir.Name.StartsWith(hiddenFiles))
+                                {
+                                    Console.WriteLine(sDir.Name);
+
+                                    if (sDir.IsDirectory)
+                                    {
+                                        GetDirectoryTree(sftp, dir.FullName);
+                                    }
+                                }
+
+
+
+                                //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsRegularFile)
+                                //{
+                                //    Console.WriteLine(sDir.Name);
+
+                                //}
+                                //if (!dir.Name.StartsWith(hiddenFiles) && sDir.IsDirectory)
+                                //{
+                                //    Console.WriteLine(sDir.Name);
+
+                                //}
+                                //if (!subDirectories.Contains(sDir))
+                                //{
+                                //    GetDirectoryTree(sftp, sDir);
+                                //}
+
+                            }
+
                         }
-                        if (!sDir.Name.StartsWith(hiddenFiles) && sDir.IsDirectory)
-                        {
-                            Console.WriteLine("*" + sDir.Name);
-                        }
-                    }
+                    }                    
                 }
-
-
             }
+
         }
     }
 }

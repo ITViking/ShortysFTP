@@ -31,9 +31,9 @@ namespace ShortysFTP
                         //Remote location
                         Console.WriteLine("== Remote ==");
 
-                        string tf = "/home/phil/Development";
+                        string path = sftp.WorkingDirectory;
 
-                        GetDirectoryTree(sftp, tf);
+                        GetDirectoryTree(sftp, path);
 
                         Console.WriteLine("");
                         Console.WriteLine("what file do you want to download?");
@@ -96,11 +96,11 @@ namespace ShortysFTP
 
         }
 
-        private static void GetDirectoryTree(SftpClient sftp, string file)
+        private static void GetDirectoryTree(SftpClient sftp, string path)
         {
             string hiddenFiles = "."; //Dont list system files and etc            
 
-            List<SftpFile> directories = sftp.ListDirectory(file).ToList();
+            List<SftpFile> directories = sftp.ListDirectory(path).ToList();
             
             foreach (var dir in directories)
             {
